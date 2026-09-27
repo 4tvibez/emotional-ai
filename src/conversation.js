@@ -28,14 +28,14 @@ export function createConversationEngine() {
       await memory.rememberFromMessage(clean);
 
       const before = planResponse(clean,emotions.snapshot(),await memory.context());
-      emotions.apply(before.event);
+      emotions.apply(before.event);\n      if (before.event === "kindness" || before.event === "success" || before.event === "greeting") await memory.addRelationshipEvent("positive", before.event);\n      if (before.event === "insult" || before.event === "danger") await memory.addRelationshipEvent("negative", before.event);\n      if (before.event === "apology") await memory.addRelationshipEvent("apology", "The user apologized.");
 
       const context = await memory.context();
       const plan = planResponse(clean,emotions.snapshot(),context);
       const response = await generateWithLocalModel({
         message:clean,
         emotions:emotions.snapshot(),
-        memory:context,
+        memory:context,\n        emotionalHistory:emotions.history,
         personality,
         plan
       });
@@ -49,7 +49,7 @@ export function createConversationEngine() {
         emotions:emotions.snapshot(),
         personality,
         permissions:permissionSnapshot(),
-        memory:memory.data
+        memory:memory.data,\n        emotionalHistory:emotions.history
       };
     },
 
