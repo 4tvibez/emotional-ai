@@ -16,7 +16,7 @@ function escapeHtml(value){
   return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 }
 
-function render(state){
+function render(state){\n  if(window.novaAvatar) window.novaAvatar.setState(state.emotions);
   const e=state.emotions;
   $("#dominant").textContent="Dominant: "+e.dominant;
   const labels=["happiness","sadness","anger","fear","trust","energy"];
@@ -41,10 +41,10 @@ $("#chat-form").addEventListener("submit",async event=>{
   const message=input.value.trim();
   if(!message)return;
   addMessage("user",message);
-  input.value="";
+  input.value="";\n  if(window.novaAvatar) window.novaAvatar.listening();
   const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message})});
   const data=await res.json();
-  addMessage("assistant",data.response||data.error||"No response.");
+  addMessage("assistant",data.response||data.error||"No response.");\n  if(window.novaAvatar) window.novaAvatar.speak(Math.min(4200,700+(data.response||"").length*18));
   render(data);
 });
 
