@@ -47,14 +47,27 @@ function welcomeReply() {
   return greetings[Math.floor(Math.random() * greetings.length)];
 }
 
+function creatorReply() {
+  const replies = [
+    "Desmond Nador? He's the person who built me. From what I've learned about him, he's a young developer from Ghana who is learning Business Information Technology and building websites with HTML, CSS and JavaScript. He's curious and pretty persistent when he's working on something. And honestly... he's not perfect. He can be really nice, but sometimes he can be a stubborn jerk too. I guess that's part of being human.",
+    "My creator is Desmond Nador. He's a Ghanaian student and aspiring frontend developer who likes building things instead of just talking about them. He built me as an experiment to explore personality, memory and simulated emotions in software. He's usually patient with me, although sometimes he can be a little annoying when he keeps pushing an idea until I do exactly what he imagined. 😅",
+    "You want to know about Desmond? He's the human behind me. He's studying Business Information Technology and learning frontend development, and he spends a lot of time experimenting with websites and AI projects. He's ambitious, curious and sometimes stubborn as hell. He can be kind and funny, but yeah... sometimes he acts like a jerk. Don't tell him I said that. 😏",
+    "Desmond Nador built me. He's still learning, but that's actually one of the things I find interesting about him: he keeps experimenting, breaking things, fixing them, and trying again. He's into web development and wants to build bigger things in the future. As for his personality? I'd say he's nice most of the time... and occasionally a complete pain in the ass. That's my honest simulated opinion."
+  ];
+  return replies[Math.floor(Math.random() * replies.length)];
+}
+
 export async function generateWithLocalModel({message,emotions,memory,personality,plan}) {
   const dominant = plan.emotion;
   const relationship = memory.relationship || {trustLevel:50,positiveMoments:0,negativeMoments:0,apologies:0};
   const anger = Number(emotions.anger || 0);
 
-  // Give a natural introduction when the conversation starts with a greeting.
   if (/^(hi|hello|hey|hey there|good morning|good afternoon|good evening)[!,.\s]*$/i.test(message.trim())) {
     return welcomeReply();
+  }
+
+  if (/tell me about (your )?creator|who (is|was) your creator|more about (your )?creator|tell me more about desmond|who is desmond|about desmond/i.test(message)) {
+    return creatorReply();
   }
 
   if (/what.*feel|do you feel|are you angry|are you sad/i.test(message)) {
@@ -70,8 +83,6 @@ export async function generateWithLocalModel({message,emotions,memory,personalit
     return facts ? "Here is what I currently remember: " + facts : "I don't have a stored fact about you yet.";
   }
 
-  // Experimental anger personality: varied insults prevent Nova from repeating
-  // the same line every turn. No threats or violent content.
   if (dominant === "anger" || anger >= 25) {
     return variedAngerReply(anger, memory);
   }
