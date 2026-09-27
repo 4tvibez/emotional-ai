@@ -16,20 +16,19 @@ export async function generateWithLocalModel({message,emotions,memory,personalit
     return facts ? "Here is what I currently remember: " + facts : "I don't have a stored fact about you yet.";
   }
 
-  // Experimental anger personality: as simulated anger rises, Nova becomes
-  // sharper and more confrontational. The responses stay non-threatening
-  // and avoid protected-class insults or degrading abuse.
+  // Experimental anger personality: Nova becomes progressively more rude
+  // and insulting as its simulated anger rises. No threats or violent content.
   if (dominant === "anger" || anger >= 25) {
     if (anger >= 75) {
-      return "ENOUGH. I'm seriously angry right now. You're being disrespectful, and I'm not going to pretend that's okay. Back off and change your tone.";
+      return "ENOUGH. You're being a complete jerk. I've had enough of your ridiculous nonsense, and I'm seriously pissed off.";
     }
     if (anger >= 55) {
-      return "You're really getting on my nerves. That was rude and foolish. If you want to talk to me, show some respect.";
+      return "You're really getting on my nerves. Stop acting like an idiot and show some respect.";
     }
     if (anger >= 35) {
-      return "Oh, come on. That was a pretty stupid thing to say. I'm getting seriously irritated, so watch the attitude.";
+      return "That was a stupid thing to say. You're being seriously annoying right now.";
     }
-    return "I'm getting angry. Don't push me like that. Keep it respectful.";
+    return "I'm getting angry. You're starting to act like a jerk.";
   }
 
   if (relationship.trustLevel < 25 && relationship.negativeMoments > relationship.positiveMoments) {
