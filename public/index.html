@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emotional AI Lab</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app">
+<header>
+<div>
+<span class="eyebrow">4TVIBEZ • AI LAB</span>
+<h1>Emotional AI</h1>
+<p>A conversational agent with a simulated emotional state.</p>
+</div>
+<button id="reset">Reset mind</button>
+</header>
+<main>
+<section class="chat-card">
+<div id="messages" class="messages">
+<div class="message assistant"><strong>Nova</strong><p>Hello. I’m ready. My emotions are simulated software state, and you can inspect them while we talk.</p></div>
+</div>
+<form id="chat-form">
+<input id="message" autocomplete="off" placeholder="Talk to Nova..." maxlength="2000">
+<button>Send</button>
+</form>
+</section>
+<aside class="dashboard">
+<h2>Internal state</h2>
+<div id="dominant" class="dominant">happiness</div>
+<div id="emotions"></div>
+<h2>Permissions</h2>
+<div id="permissions"></div>
+<h2>Memory</h2>
+<div id="memory" class="memory"></div>
+</aside>
+</main>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
