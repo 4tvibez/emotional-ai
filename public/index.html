@@ -17,7 +17,26 @@
 <button id="reset">Reset mind</button>
 </header>
 <main>
-<section class="chat-card">
+<div class="avatar-stage" id="avatar-stage">
+  <div class="avatar-glow"></div>
+  <div class="avatar" id="nova-avatar" aria-label="Animated Nova avatar">
+    <div class="avatar-hair"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="avatar-head">
+      <div class="forehead-light"></div>
+      <div class="brow brow-left"></div><div class="brow brow-right"></div>
+      <div class="eye eye-left"><span class="iris"><i></i></span><span class="lid"></span></div>
+      <div class="eye eye-right"><span class="iris"><i></i></span><span class="lid"></span></div>
+      <div class="nose"></div>
+      <div class="cheek cheek-left"></div><div class="cheek cheek-right"></div>
+      <div class="mouth"><span></span></div>
+      <div class="chin-light"></div>
+    </div>
+    <div class="neck"></div>
+    <div class="shoulders"><span></span><span></span></div>
+  </div>
+  <div class="avatar-status"><span class="status-dot"></span><span id="avatar-status-text">Idle</span></div>
+  <div class="voice-bars" id="voice-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</div>\n<section class="chat-card">
 <div id="messages" class="messages">
 <div class="message assistant"><strong>Nova</strong><p>Hello. I’m ready. My emotions are simulated software state, and you can inspect them while we talk.</p></div>
 </div>
@@ -37,6 +56,6 @@
 </aside>
 </main>
 </div>
-<script src="/app.js"></script>
+<script src="/avatar.js"></script>\n<script src="/app.js"></script>
 </body>
 </html>
