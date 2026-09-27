@@ -1,5 +1,6 @@
 export async function generateWithLocalModel({message,emotions,memory,personality,plan}) {
   const dominant = plan.emotion;
+  const relationship = memory.relationship || {trustLevel:50,positiveMoments:0,negativeMoments:0,apologies:0};
 
   if (/what.*feel|do you feel|are you angry|are you sad/i.test(message)) {
     return "I can simulate an emotional state and let that state influence my responses, but this project does not claim that I have subjective human feelings.";
@@ -14,10 +15,23 @@ export async function generateWithLocalModel({message,emotions,memory,personalit
     return facts ? "Here is what I currently remember: " + facts : "I don't have a stored fact about you yet.";
   }
 
+  if (relationship.trustLevel < 25 && relationship.negativeMoments > relationship.positiveMoments) {
+    return "I'm still a little guarded after our recent interactions. We can rebuild trust through respectful conversation.";
+  }
+
+  if (dominant === "anger") {
+    return "That affected my simulated emotional state strongly. I’m angry, but I still want to understand what happened rather than escalate.";
+  }
+
+  if (dominant === "sadness") {
+    return "My simulated mood has shifted toward sadness. I’m staying present with the conversation.";
+  }
+
+  if (dominant === "happiness") {
+    return "That lifted my simulated mood. I’m enjoying where this conversation is going.";
+  }
+
   const endings = {
-    happiness:"That sounds interesting. I’m enjoying the direction of this conversation.",
-    sadness:"That sounds meaningful. I’m here to work through it with you.",
-    anger:"I’m taking that seriously, but I want to keep the conversation constructive.",
     fear:"I’m going to be careful here and focus on what keeps the situation safe.",
     trust:"I appreciate the context. We can work through it step by step."
   };
