@@ -1,0 +1,14 @@
+:root{font-family:Inter,system-ui,sans-serif;color:#eef2ff;background:#070914;--panel:#10152a;--border:#242c4a;--muted:#8d96b5;--accent:#8b7cff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#17204a,#070914 48%)}
+button,input{font:inherit}button{cursor:pointer}.app{width:min(1200px,94vw);margin:auto;padding:32px 0}
+header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}
+.eyebrow{color:#9f95ff;letter-spacing:.16em;font-size:.75rem}h1{font-size:clamp(2.2rem,6vw,4.5rem);margin:.2em 0}p{color:var(--muted);line-height:1.6}
+header button,form button{border:0;border-radius:12px;padding:12px 18px;background:var(--accent);color:white;font-weight:700}
+main{display:grid;grid-template-columns:1fr 330px;gap:20px}.chat-card,.dashboard{background:rgba(16,21,42,.9);border:1px solid var(--border);border-radius:20px;padding:18px;box-shadow:0 20px 60px #0005}
+.messages{min-height:520px;max-height:60vh;overflow:auto;padding:10px}.message{max-width:82%;margin:10px 0;padding:12px 15px;border-radius:16px;background:#181f3a}
+.message.user{margin-left:auto;background:#29214f}.message strong{font-size:.8rem;color:#aaa2ff}.message p{margin:5px 0 0;color:#eef2ff}
+form{display:flex;gap:10px;margin-top:12px}input{flex:1;min-width:0;background:#090d1d;color:white;border:1px solid var(--border);border-radius:12px;padding:14px;outline:none}
+.dashboard h2{font-size:1rem;margin:10px 0}.dominant{padding:12px;border-radius:12px;background:#181f3a;color:#a9a1ff;margin-bottom:15px;text-transform:capitalize}
+.emotion{margin:12px 0}.emotion-top{display:flex;justify-content:space-between;font-size:.82rem}.bar{height:7px;border-radius:99px;background:#252c48;overflow:hidden;margin-top:6px}.fill{height:100%;background:linear-gradient(90deg,#7066ff,#c76dff)}
+.permission,.memory-item{font-size:.82rem;padding:9px 0;border-bottom:1px solid #202640;color:var(--muted)}.permission span{float:right;color:#7ee2a8}
+@media(max-width:850px){main{grid-template-columns:1fr}.messages{min-height:420px}header{align-items:flex-start;flex-direction:column}}
