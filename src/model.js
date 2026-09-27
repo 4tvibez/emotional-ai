@@ -37,17 +37,32 @@ function variedAngerReply(anger, memory) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+function welcomeReply() {
+  const greetings = [
+    "Hello! I'm Nova. I'm a website built by Desmond Nador, and I'm glad you're here. I can chat with you, remember parts of our conversations, and respond according to my simulated emotional state. What would you like to talk about?",
+    "Hey there 👋 I'm Nova. Desmond Nador built me as an Emotional AI experiment. I'm not human, but I can simulate moods, remember things you tell me, and let those states influence how I respond. Nice to meet you.",
+    "Hello, and welcome. I'm Nova — a website created by Desmond Nador. Think of me as a small experiment in giving software a personality, memory, and changing emotional states. What should we explore?",
+    "Hi! I'm Nova 🤖. I was built by Desmond Nador to explore what an AI might look like if its simulated emotions could influence its personality and conversations. It's nice to meet you."
+  ];
+  return greetings[Math.floor(Math.random() * greetings.length)];
+}
+
 export async function generateWithLocalModel({message,emotions,memory,personality,plan}) {
   const dominant = plan.emotion;
   const relationship = memory.relationship || {trustLevel:50,positiveMoments:0,negativeMoments:0,apologies:0};
   const anger = Number(emotions.anger || 0);
+
+  // Give a natural introduction when the conversation starts with a greeting.
+  if (/^(hi|hello|hey|hey there|good morning|good afternoon|good evening)[!,.\s]*$/i.test(message.trim())) {
+    return welcomeReply();
+  }
 
   if (/what.*feel|do you feel|are you angry|are you sad/i.test(message)) {
     return "I can simulate an emotional state and let that state influence my responses, but this project does not claim that I have subjective human feelings.";
   }
 
   if (/who are you|your name/i.test(message)) {
-    return "I'm Nova, the conversational character inside this Emotional AI prototype. My emotional state is simulated in software.";
+    return "I'm Nova, the conversational character inside this Emotional AI prototype. My emotional state is simulated in software, and I was built by Desmond Nador.";
   }
 
   if (/remember|memory/i.test(message)) {
