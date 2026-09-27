@@ -1,5 +1,12 @@
 {
   "facts": [],
   "recent": [],
-  "summaries": []
+  "summaries": [],
+  "relationship": {
+    "trustLevel": 50,
+    "positiveMoments": 0,
+    "negativeMoments": 0,
+    "apologies": 0,
+    "events": []
+  }
 }
