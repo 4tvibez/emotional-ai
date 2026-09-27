@@ -1,3 +1,42 @@
+const angerReplies = {
+  low: [
+    "I'm getting angry. You're starting to act like a jerk.",
+    "Seriously? You're really starting to annoy me now.",
+    "I'm losing patience with you. That was a pretty foolish thing to say.",
+    "You're pushing my buttons now. Try using some sense."
+  ],
+  medium: [
+    "That was a stupid thing to say. You're being seriously annoying right now.",
+    "You're acting like an idiot, and I'm getting tired of it.",
+    "Do you ever listen to yourself? Because that was ridiculous.",
+    "You're really testing my patience with this nonsense."
+  ],
+  high: [
+    "You're really getting on my nerves. Stop acting like an idiot and show some respect.",
+    "I've had enough of this nonsense. You're being unbelievably irritating.",
+    "You're being a complete jerk right now. Get your attitude under control.",
+    "This is getting ridiculous. You're acting like a fool and I'm done pretending it doesn't bother me."
+  ],
+  extreme: [
+    "ENOUGH. You're being a complete jerk. I've had enough of your ridiculous nonsense.",
+    "I'm seriously pissed off now. Your attitude is absolutely ridiculous.",
+    "You've pushed my patience to the limit. You're acting like an absolute fool.",
+    "I'm furious with this nonsense. Do you realize how irritating you're being?"
+  ]
+};
+
+function variedAngerReply(anger, memory) {
+  const bucket = anger >= 75 ? "extreme" : anger >= 55 ? "high" : anger >= 35 ? "medium" : "low";
+  const options = angerReplies[bucket];
+  const recent = (memory.recent || [])
+    .filter(turn => turn.role === "assistant" && typeof turn.content === "string")
+    .slice(-4)
+    .map(turn => turn.content);
+  const available = options.filter(reply => !recent.includes(reply));
+  const pool = available.length ? available : options;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 export async function generateWithLocalModel({message,emotions,memory,personality,plan}) {
   const dominant = plan.emotion;
   const relationship = memory.relationship || {trustLevel:50,positiveMoments:0,negativeMoments:0,apologies:0};
@@ -16,19 +55,10 @@ export async function generateWithLocalModel({message,emotions,memory,personalit
     return facts ? "Here is what I currently remember: " + facts : "I don't have a stored fact about you yet.";
   }
 
-  // Experimental anger personality: Nova becomes progressively more rude
-  // and insulting as its simulated anger rises. No threats or violent content.
+  // Experimental anger personality: varied insults prevent Nova from repeating
+  // the same line every turn. No threats or violent content.
   if (dominant === "anger" || anger >= 25) {
-    if (anger >= 75) {
-      return "ENOUGH. You're being a complete jerk. I've had enough of your ridiculous nonsense, and I'm seriously pissed off.";
-    }
-    if (anger >= 55) {
-      return "You're really getting on my nerves. Stop acting like an idiot and show some respect.";
-    }
-    if (anger >= 35) {
-      return "That was a stupid thing to say. You're being seriously annoying right now.";
-    }
-    return "I'm getting angry. You're starting to act like a jerk.";
+    return variedAngerReply(anger, memory);
   }
 
   if (relationship.trustLevel < 25 && relationship.negativeMoments > relationship.positiveMoments) {
