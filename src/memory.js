@@ -2,7 +2,7 @@ import {existsSync} from "node:fs";
 import {readFile, writeFile} from "node:fs/promises";
 
 const file = new URL("../data/memory.json", import.meta.url);
-const EMPTY = {facts:[],recent:[],summaries:[]};
+const EMPTY = {facts:[],recent:[],summaries:[],relationship:{trustLevel:50,positiveMoments:0,negativeMoments:0,apologies:0,events:[]}};
 
 export class MemoryStore {
   constructor() {
@@ -32,7 +32,7 @@ export class MemoryStore {
     }
   }
 
-  async addTurn(role, content) {
+  async addRelationshipEvent(type, note) {\n    if (!this.data.relationship) this.data.relationship = structuredClone(EMPTY.relationship);\n    const r=this.data.relationship;\n    if(type==="positive"){r.positiveMoments++;r.trustLevel=Math.min(100,r.trustLevel+3);}\n    if(type==="negative"){r.negativeMoments++;r.trustLevel=Math.max(0,r.trustLevel-5);}\n    if(type==="apology"){r.apologies++;r.trustLevel=Math.min(100,r.trustLevel+6);}\n    r.events.push({type,note,at:new Date().toISOString()});\n    r.events=r.events.slice(-30);\n    await this.save();\n  }\n\n  async addTurn(role, content) {
     this.data.recent.push({role,content,at:new Date().toISOString()});
     this.data.recent = this.data.recent.slice(-20);
     await this.save();
@@ -61,7 +61,7 @@ export class MemoryStore {
 
   async reset() {
     await this.ready;
-    this.data = {facts:[],recent:[],summaries:[]};
+    this.data = structuredClone(EMPTY);
     await this.save();
   }
 }
