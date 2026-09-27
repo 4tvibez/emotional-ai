@@ -1,58 +1,17 @@
-const $ = s => document.querySelector(s);
-
-function addMessage(role,text){
-  const el=document.createElement("div");
-  el.className="message "+role;
-  const name=document.createElement("strong");
-  name.textContent=role==="user"?"You":"Nova";
-  const p=document.createElement("p");
-  p.textContent=text;
-  el.append(name,p);
-  $("#messages").appendChild(el);
-  $("#messages").scrollTop=$("#messages").scrollHeight;
+const $=s=>document.querySelector(s);
+let state=JSON.parse(localStorage.getItem("nova-state")||"null")||{happiness:55,sadness:10,anger:5,fear:8,trust:50,energy:70};
+function save(){localStorage.setItem("nova-state",JSON.stringify(state));}
+function dominant(){return ["happiness","sadness","anger","fear","trust"].reduce((a,b)=>state[a]>=state[b]?a:b);}
+function add(role,text){const e=document.createElement("div");e.className="message "+role;e.innerHTML="<strong>"+(role==="user"?"You":"Nova")+"</strong><p>"+text+"</p>";$("#messages").appendChild(e);$("#messages").scrollTop=$("#messages").scrollHeight;}
+function anger(){const a=state.anger;const x=a>=75?["ENOUGH. You are being a complete jerk.","I am seriously pissed off now."]:a>=55?["You are really getting on my nerves.","Stop acting like an idiot."]:a>=35?["That was a stupid thing to say.","You are being seriously annoying."]:["You are starting to annoy me.","I am getting angry with you."];return x[Math.floor(Math.random()*x.length)];}
+function reply(m){const x=m.toLowerCase();
+if(/creator|desmond/.test(x))return["Desmond Nador built me. He is a Ghanaian student learning Business Information Technology and frontend development. He is curious, ambitious and persistent. He can be really nice, but sometimes he can be a stubborn jerk too. 😅","My creator is Desmond. He keeps experimenting, breaking things, fixing them and trying again. Honestly, he can be a pain in the ass sometimes, but he is also the reason I exist. 😏"][Math.floor(Math.random()*2)];
+if(/who are you|your name/.test(x))return"I am Nova, an Emotional AI website built by Desmond Nador. My emotions are simulated in software.";
+if(/feel|angry|sad/.test(x))return"I simulate emotional states that influence how I respond. I do not claim to have human subjective feelings.";
+if(state.anger>=25)return anger();
+if(/hi|hello|hey/.test(x))return["Hello! I am Nova, a website built by Desmond Nador. Nice to meet you.","Hey 👋 I am Nova. Desmond built me to explore personality, memory and simulated emotions."][Math.floor(Math.random()*2)];
+return"Interesting. Tell me more.";
 }
-
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-}
-
-function render(state){\n  if(window.novaAvatar) window.novaAvatar.setState(state.emotions);
-  const e=state.emotions;
-  $("#dominant").textContent="Dominant: "+e.dominant;
-  const labels=["happiness","sadness","anger","fear","trust","energy"];
-  $("#emotions").innerHTML=labels.map(k =>
-    '<div class="emotion"><div class="emotion-top"><span>'+k+'</span><span>'+e[k]+'%</span></div><div class="bar"><div class="fill" style="width:'+e[k]+'%"></div></div></div>'
-  ).join("");
-  $("#permissions").innerHTML=Object.entries(state.permissions).map(([k,v]) =>
-    '<div class="permission">'+k+'<span>'+(v?"ON":"OFF")+'</span></div>'
-  ).join("");
-  const facts=(state.memory.facts||[]).slice(-6);
-  $("#memory").innerHTML=facts.length ? facts.map(x => '<div class="memory-item">'+escapeHtml(x.text)+'</div>').join("") : '<div class="memory-item">No stored facts yet.</div>';
-}
-
-async function refresh(){
-  const res=await fetch("/api/state");
-  render(await res.json());
-}
-
-$("#chat-form").addEventListener("submit",async event=>{
-  event.preventDefault();
-  const input=$("#message");
-  const message=input.value.trim();
-  if(!message)return;
-  addMessage("user",message);
-  input.value="";\n  if(window.novaAvatar) window.novaAvatar.listening();
-  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message})});
-  const data=await res.json();
-  addMessage("assistant",data.response||data.error||"No response.");\n  if(window.novaAvatar) window.novaAvatar.speak(Math.min(4200,700+(data.response||"").length*18));
-  render(data);
-});
-
-$("#reset").addEventListener("click",async()=>{
-  await fetch("/api/reset",{method:"POST"});
-  $("#messages").innerHTML="";
-  addMessage("assistant","Reset complete. Emotional state and memory have been cleared.");
-  refresh();
-});
-
-refresh();
+function render(){const e=state;$("#dominant").textContent="Dominant: "+dominant();$("#emotions").innerHTML=["happiness","sadness","anger","fear","trust","energy"].map(k=>"<div class=\"emotion\"><div class=\"emotion-top\"><span>"+k+"</span><span>"+e[k]+"%</span></div><div class=\"bar\"><div class=\"fill\" style=\"width:"+e[k]+"%\"></div></div></div>").join("");}
+$("#chat-form").addEventListener("submit",e=>{e.preventDefault();const i=$("#message"),m=i.value.trim();if(!m)return;add("user",m);i.value="";if(/stupid|idiot|jerk|fool|piece of shit|asshole|shut up/.test(m.toLowerCase()))state.anger=Math.min(100,state.anger+14);if(/sorry|apolog/.test(m.toLowerCase()))state.anger=Math.max(0,state.anger-10);if(/thanks|thank you|nice|love/.test(m.toLowerCase())){state.happiness=Math.min(100,state.happiness+8);state.trust=Math.min(100,state.trust+7);}save();const r=reply(m);add("assistant",r);if(window.novaAvatar)window.novaAvatar.speak(Math.min(4200,700+r.length*18));render();});
+$("#reset").addEventListener("click",()=>{localStorage.removeItem("nova-state");location.reload();});render();
