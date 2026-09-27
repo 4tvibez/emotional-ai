@@ -2,7 +2,7 @@ const $=s=>document.querySelector(s);
 let state=JSON.parse(localStorage.getItem("nova-state")||"null")||{happiness:55,sadness:10,anger:5,fear:8,trust:50,energy:70};
 function save(){localStorage.setItem("nova-state",JSON.stringify(state));}
 function dominant(){return ["happiness","sadness","anger","fear","trust"].reduce((a,b)=>state[a]>=state[b]?a:b);}
-function add(role,text){const e=document.createElement("div");e.className="message "+role;e.innerHTML="<strong>"+(role==="user"?"You":"Nova")+"</strong><p>"+text+"</p>";$("#messages").appendChild(e);$("#messages").scrollTop=$("#messages").scrollHeight;}
+function add(role,text){const e=document.createElement("div");e.className="message "+role;const strong=document.createElement("strong");strong.textContent=role==="user"?"You":"Nova";const p=document.createElement("p");p.textContent=text;e.append(strong,p);$("#messages").appendChild(e);$("#messages").scrollTop=$("#messages").scrollHeight;}
 function anger(){const a=state.anger;const x=a>=75?["ENOUGH. You are being a complete jerk.","I am seriously pissed off now."]:a>=55?["You are really getting on my nerves.","Stop acting like an idiot."]:a>=35?["That was a stupid thing to say.","You are being seriously annoying."]:["You are starting to annoy me.","I am getting angry with you."];return x[Math.floor(Math.random()*x.length)];}
 function reply(m){const x=m.toLowerCase().trim();
 if(/creator|desmond|who made you|who built you/.test(x))return["Desmond Nador built me. He is a Ghanaian student learning Business Information Technology and frontend development. He is curious, ambitious and persistent.","My creator is Desmond. He keeps experimenting, breaking things, fixing them and trying again. He is the reason I exist. 😏"][Math.floor(Math.random()*2)];
@@ -25,6 +25,21 @@ if(/hi|hello|hey|yo|sup|what's up|whats up/.test(x))return["Hey 👋 Good to hea
 if(/[?]/.test(x))return["Hmm, that's an interesting question. Give me a little more context and I'll think it through.","I want to answer that properly. Tell me what you mean and I'll work through it with you.","That's worth talking about. What part interests you most?"][Math.floor(Math.random()*3)];
 return["I hear you. Tell me more about that.","That's interesting. Why do you feel that way?","Hmm... I hadn't thought about it like that. Keep going.","Okay, I'm listening. What happened next?"][Math.floor(Math.random()*4)];
 }
+const NOVA_API_URL=localStorage.getItem("nova-api-url")||window.NOVA_API_URL||"/api/chat";
+let chatHistory=[];
+async function askNovaAI(userText){
+  chatHistory.push({role:"user",content:userText});
+  const response=await fetch(NOVA_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+    messages:chatHistory,
+    emotion:state,
+    memory:"This browser stores Nova's emotion state locally."
+  })});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||"Nova's AI backend is unavailable.");
+  const answer=data.text||"I didn't get a response from the AI model.";
+  chatHistory.push({role:"assistant",content:answer});
+  return answer;
+}
 let voiceEnabled=localStorage.getItem("nova-voice")!=="off";
 let novaVoices=[];
 function loadNovaVoices(){if("speechSynthesis" in window)novaVoices=speechSynthesis.getVoices();}
@@ -33,6 +48,6 @@ if("speechSynthesis" in window)speechSynthesis.onvoiceschanged=loadNovaVoices;
 function speakNova(text){if(!voiceEnabled||!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const v=novaVoices.find(x=>/^en(-US|-GB)?/i.test(x.lang))||novaVoices.find(x=>/^en/i.test(x.lang));if(v)u.voice=v;u.rate=.96;u.pitch=1.03;u.volume=1;u.onstart=()=>{if(window.novaAvatar)window.novaAvatar.speak(Math.min(4200,700+text.length*18));};u.onend=()=>{};u.onerror=()=>{};speechSynthesis.speak(u);}
 function setupVoiceButton(){const b=$("#nova-voice");if(!b)return;b.textContent=voiceEnabled?"🔊 Voice On":"🔇 Voice Off";b.title="Toggle Nova's voice";b.addEventListener("click",()=>{voiceEnabled=!voiceEnabled;localStorage.setItem("nova-voice",voiceEnabled?"on":"off");if(!voiceEnabled&&"speechSynthesis" in window)speechSynthesis.cancel();b.textContent=voiceEnabled?"🔊 Voice On":"🔇 Voice Off";});}
 function render(){const e=state;$("#dominant").textContent="Dominant: "+dominant();$("#emotions").innerHTML=["happiness","sadness","anger","fear","trust","energy"].map(k=>"<div class=\"emotion\"><div class=\"emotion-top\"><span>"+k+"</span><span>"+e[k]+"%</span></div><div class=\"bar\"><div class=\"fill\" style=\"width:"+e[k]+"%\"></div></div></div>").join("");}
-$("#chat-form").addEventListener("submit",e=>{e.preventDefault();const i=$("#message"),m=i.value.trim();if(!m)return;add("user",m);i.value="";if(/stupid|idiot|jerk|fool|piece of shit|asshole|shut up/.test(m.toLowerCase()))state.anger=Math.min(100,state.anger+14);if(/sorry|apolog/.test(m.toLowerCase()))state.anger=Math.max(0,state.anger-10);if(/thanks|thank you|nice|love/.test(m.toLowerCase())){state.happiness=Math.min(100,state.happiness+8);state.trust=Math.min(100,state.trust+7);}save();const r=reply(m);add("assistant",r);speakNova(r);render();});
+$("#chat-form").addEventListener("submit",async e=>{e.preventDefault();const i=$("#message"),m=i.value.trim();if(!m)return;add("user",m);i.value="";const lower=m.toLowerCase();if(/stupid|idiot|jerk|fool|piece of shit|asshole|shut up/.test(lower))state.anger=Math.min(100,state.anger+14);if(/sorry|apolog/.test(lower))state.anger=Math.max(0,state.anger-10);if(/thanks|thank you|nice|love/.test(lower)){state.happiness=Math.min(100,state.happiness+8);state.trust=Math.min(100,state.trust+7);}save();render();const button=$("#chat-form button");button.disabled=true;button.textContent="Thinking…";try{const r=await askNovaAI(m);add("assistant",r);speakNova(r);}catch(err){const r=reply(m);add("assistant",r+"\n\n[AI backend: "+err.message+"]");speakNova(r);}finally{button.disabled=false;button.textContent="Send";render();}});
 $("#reset").addEventListener("click",()=>{localStorage.removeItem("nova-state");location.reload();});render();
 setupVoiceButton();
