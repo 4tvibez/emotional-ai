@@ -12,7 +12,8 @@ export const DEFAULT_EMOTIONS = {
 export class EmotionEngine {
   constructor(initial = {}) {
     this.values = {...DEFAULT_EMOTIONS, ...initial};
-    this.lastEvent = "boot";\n    this.history = [];
+    this.lastEvent = "boot";
+    this.history = [];
   }
 
   snapshot() {
@@ -53,6 +54,7 @@ export class EmotionEngine {
 
   reset() {
     this.values = {...DEFAULT_EMOTIONS};
-    this.lastEvent = "reset";\n    this.history = [];
+    this.lastEvent = "reset";
+    this.history = [];
   }
 }
