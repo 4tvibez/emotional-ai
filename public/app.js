@@ -25,7 +25,7 @@ if(/hi|hello|hey|yo|sup|what's up|whats up/.test(x))return["Hey 👋 Good to hea
 if(/[?]/.test(x))return["Hmm, that's an interesting question. Give me a little more context and I'll think it through.","I want to answer that properly. Tell me what you mean and I'll work through it with you.","That's worth talking about. What part interests you most?"][Math.floor(Math.random()*3)];
 return["I hear you. Tell me more about that.","That's interesting. Why do you feel that way?","Hmm... I hadn't thought about it like that. Keep going.","Okay, I'm listening. What happened next?"][Math.floor(Math.random()*4)];
 }
-const NOVA_API_URL=localStorage.getItem("nova-api-url")||window.NOVA_API_URL||"/api/chat";
+const NOVA_API_URL=localStorage.getItem("nova-api-url")||window.NOVA_API_URL||"https://emotional-ai-4t3.vercel.app/api/chat";
 let chatHistory=[];
 async function askNovaAI(userText){
   chatHistory.push({role:"user",content:userText});
